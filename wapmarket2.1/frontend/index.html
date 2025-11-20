@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WapMarket - Tienda</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><h1>WapMarket</h1><span class="tag">Guinea Ecuatorial - XAF</span></div>
+  <nav>
+    <button id="view-cart" class="btn small">Carrito (<span id="cart-count">0</span>)</button>
+    <a href="/admin.html" class="btn small ghost">Admin</a>
+  </nav>
+</header>
+
+<main class="container">
+  <aside class="sidebar card">
+    <h3>Categorías</h3>
+    <ul id="categories"></ul>
+  </aside>
+
+  <section class="content">
+    <div id="banner-area"></div>
+    <div id="products" class="grid"></div>
+  </section>
+</main>
+
+<!-- Cart modal -->
+<div id="cart-modal" class="modal">
+  <div class="modal-content card">
+    <h2>Tu pedido</h2>
+    <div id="cart-items"></div>
+    <div class="cart-summary">
+      <label><input type="checkbox" id="shipping-checkbox"> Envío a domicilio (+<span id="shipping-cost-label">2000</span> XAF)</label>
+      <p>Subtotal: <span id="subtotal">0</span> XAF</p>
+      <p>Envío: <span id="shipping-cost">0</span> XAF</p>
+      <p><strong>Total: <span id="total">0</span> XAF</strong></p>
+      <div class="actions">
+        <button id="place-order-btn" class="btn">Hacer pedido</button>
+        <button id="place-order-whatsapp-btn" class="btn ghost">Hacer pedido por WhatsApp</button>
+        <button id="close-cart-btn" class="btn small">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

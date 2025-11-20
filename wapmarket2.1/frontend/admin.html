@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WapMarket - Admin</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="topbar"><div class="brand"><h1>WapMarket - Admin</h1></div></header>
+<main class="container">
+  <section class="card" style="width:100%">
+    <h2>Login Admin</h2>
+    <form id="login-form">
+      <input name="email" placeholder="Email" required><br>
+      <input name="password" placeholder="Password" type="password" required><br>
+      <button class="btn" type="submit">Entrar</button>
+    </form>
+  </section>
+
+  <section class="card" style="margin-top:12px;display:none" id="admin-area">
+    <h2>Crear producto</h2>
+    <form id="product-form">
+      <input name="name" placeholder="Nombre" required><br>
+      <input name="brand" placeholder="Marca"><br>
+      <input name="price" placeholder="Precio (XAF)" type="number" required><br>
+      <input name="image_url" placeholder="URL imagen (opcional)"><br>
+      <select name="category_id" id="category-select"><option value="">Sin categoría</option></select><br>
+      <textarea name="description" placeholder="Descripción"></textarea><br>
+      <input type="file" name="image"><br>
+      <button type="submit" class="btn">Crear</button>
+    </form>
+
+    <h2 style="margin-top:18px">Crear banner (publicidad)</h2>
+    <form id="banner-form">
+      <input name="title" placeholder="Título" required><br>
+      <input name="link" placeholder="Link"><br>
+      <input name="image_url" placeholder="URL imagen (opcional)"><br>
+      <input type="file" name="image"><br>
+      <textarea name="description" placeholder="Descripción"></textarea><br>
+      <button type="submit" class="btn">Crear banner</button>
+    </form>
+
+    <h2 style="margin-top:18px">Pedidos</h2>
+    <div id="orders-list"></div>
+  </section>
+</main>
+<script>
+let token = null;
+async function login(e){
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const body = Object.fromEntries(fd.entries());
+  const res = await fetch('/api/auth/login', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+  if(res.ok){ const j = await res.json(); token = j.token; document.getElementById('admin-area').style.display='block'; alert('Login OK'); loadData(); } else alert('Credenciales inválidas');
+}
+document.getElementById('login-form').addEventListener('submit', login);
+
+async function loadData(){
+  const catsRes = await fetch('/api/products'); const list = await catsRes.json();
+  const select = document.getElementById('category-select'); select.innerHTML = '<option value="">Sin categoría</option>';
+  const categories = {};
+  list.forEach(p=>{ if(p.category) categories[p.category]=p; });
+  Object.keys(categories).forEach((c,idx)=> select.innerHTML += `<option value="${idx+1}">${c}</option>`);
+
+  const ordersRes = await fetch('/api/orders', {headers:{'Authorization':'Bearer '+token}});
+  const orders = await ordersRes.json();
+  const el = document.getElementById('orders-list'); el.innerHTML = '';
+  orders.forEach(o=>{ const d=document.createElement('div'); d.className='card'; d.innerHTML=`<strong>#${o.id}</strong> ${o.customer_name} - ${o.phone} - ${o.total} XAF<br>Items: <pre>${JSON.stringify(o.items)}</pre>`; el.appendChild(d); });
+}
+
+document.getElementById('product-form').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  if(!token){ alert('Debes iniciar sesión'); return; }
+  const fd = new FormData(e.target);
+  const res = await fetch('/api/products', {method:'POST', headers:{'Authorization':'Bearer '+token}, body: fd});
+  if(res.ok){ alert('Producto creado'); e.target.reset(); loadData(); } else { alert('Error al crear producto'); }
+});
+
+document.getElementById('banner-form').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  if(!token){ alert('Debes iniciar sesión'); return; }
+  const fd = new FormData(e.target);
+  const res = await fetch('/api/banners', {method:'POST', headers:{'Authorization':'Bearer '+token}, body: fd});
+  if(res.ok){ alert('Banner creado'); e.target.reset(); loadData(); } else { alert('Error al crear banner'); }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: wapuser
+      POSTGRES_PASSWORD: wappass
+      POSTGRES_DB: wapdb
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      - PGHOST=db
+      - PGPORT=5432
+      - PGUSER=wapuser
+      - PGPASSWORD=wappass
+      - PGDATABASE=wapdb
+      - PORT=3000
+      - ADMIN_PHONE=+240555218661
+      - JWT_SECRET=supersecretjwtkey
+      - ADMIN_EMAIL=admin@wapmarket.local
+      - ADMIN_PASSWORD=admin1234
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend/uploads:/usr/src/app/uploads
+volumes:
+  db_data:
